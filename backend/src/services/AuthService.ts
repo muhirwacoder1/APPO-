@@ -44,7 +44,7 @@ async function signup(email: string, password: string, name: string, address: st
   const pwdHash = PwdUtil.hashSync(password);
   // Create user
   const user = await User.User.create({
-    email, name, address, pwdHash,
+    email, name, address, password: pwdHash,
   });
   // Return
   return user;
@@ -68,7 +68,7 @@ async function login(email: string, password: string): Promise<IUser> {
     );
   }
   // Check password
-  const hash = (user.pwdHash ?? ''),
+  const hash = (user.password ?? ''),
     pwdPassed = await PwdUtil.compare(password, hash);
   if (!pwdPassed) {
     // If password failed, wait 500ms this will increase security
