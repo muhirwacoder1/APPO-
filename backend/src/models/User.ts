@@ -1,7 +1,7 @@
 import * as ACTIONS from '@src/common/constants';
 import { string } from 'joi';
 import moment from 'moment';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 
 // **** Variables **** //
@@ -21,9 +21,10 @@ export interface IUser extends mongoose.Document {
   name: string;
   email: string;
   role?: string;
-  pwdHash: string;
+  password: string;
   address: string;
   diabetes_type?: string[];
+  smart_insoles: Types.ObjectId[];
   note?: string;
 }
 
@@ -32,12 +33,11 @@ const UserSchema = new mongoose.Schema<IUser>({
   name: { type: String, required: true },
   email: { type: String, required: true },
   role: { type: String, required: true, enum: Object.values(ACTIONS.USER_ROLES) },
-  pwdHash: { type: String },
+  password: { type: String },
   address: { type: String },
   diabetes_type: { type: [String], default: null, enum: Object.values(ACTIONS.DIABETES_TYPE) },
-  note: { type: String, default: null },
-
-})
+  smart_insoles: [{ type: Types.ObjectId }]
+});
 
 export const User = mongoose.model<IUser>('User', UserSchema);
 export interface ISessionUser {
@@ -55,7 +55,7 @@ export const isUser = (obj: unknown): obj is IUser => {
     typeof user?.name === 'string' &&
     typeof user?.email === 'string' &&
     typeof user?.role === 'string' &&
-    typeof user?.pwdHash === 'string' &&
+    typeof user?.password === 'string' &&
     typeof user?.address === 'string' &&
     Array.isArray(user?.diabetes_type) &&
     typeof user?.note === 'string'
